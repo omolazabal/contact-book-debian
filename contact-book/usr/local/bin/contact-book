@@ -1,0 +1,207 @@
+#!/usr/bin/env python3
+
+import os
+import argparse
+
+filepath = os.path.expanduser('~/.local/share/contact-book/contact-book.dat')
+os.makedirs(os.path.dirname(filepath), exist_ok=True)
+open(filepath, 'a').close()
+
+def search_book(searchItem, index):
+	found = False
+	contactList = []
+
+	with open(filepath, 'r') as f:
+		contacts = [line.strip() for line in f]
+		for contact in contacts:
+			contact = contact.strip()
+			info = contact.split(':')
+			if index == 0:
+				names = info[0].split(',')
+				fullnameF = names[1]+' '+names[0]
+				fullnameB = names[0]+' '+names[1]
+				if fullnameF.casefold().startswith(searchItem.casefold()) or fullnameB.casefold().startswith(searchItem.casefold()):
+					found = True
+					contactList.append(contact)
+			else:
+				if info[index].casefold().startswith(searchItem.casefold()):
+					found = True
+					contactList.append(contact)
+
+	if found:		
+		return True, contactList
+	else:
+		return False, None
+
+def print_info(contacts):
+	counter = 1
+	with open('/etc/contact-book.conf', 'r') as f:
+			for line in f:
+				for contact in contacts:
+					info = contact.split(':')
+					for char in line:
+						if char == 'L':	# Name
+							print(counter, '', info[0], end='')
+						if char == 'P':	# Phone
+							print('  ', info[1], end='')
+						if char == 'E':	# Email
+							print('  ', info[2], end='')
+						if char == ':':
+							print()
+					counter = counter + 1
+
+def add_contact():
+	while True:
+		name = input('Name (first last): ')
+		names = name.split()
+		if len(names) == 2 and ':' not in name:
+			break
+		else:
+			print('Invalid name')
+			del names[:]
+	while True:
+		phone = input('Phone number: ')
+		if phone.isdigit():
+			break
+		else:
+			print('Invalid phone number')
+	while True:
+		email = input('Email: ')
+		if ':' not in email and (len(email.split())) == 1 and not email.isspace():
+			email = email.strip()
+			break
+		else:
+			print('Invalid email')
+	with open(filepath, 'a') as f:
+		f.write(names[1])
+		f.write(',')
+		f.write(names[0])
+		f.write(':')
+		f.write(phone)
+		f.write(':')
+		f.write(email)
+		f.write('\n')		
+
+def delete_contact():
+	contacts = []
+	foundContacts = []
+	found = False
+	saved = 0
+	choice = 'n'
+	selection = ''
+	counter = 1
+
+	searchItem = input('Name, phone number, or email: ').casefold()
+
+	with open(filepath, 'r') as f:
+		contacts = [line.strip() for line in f]
+
+	print()
+	for contact in contacts:
+		info = contact.split(':')
+		names = info[0].split(',')
+		fullnameF = names[1]+' '+names[0]
+		fullnameB = names[0]+' '+names[1]
+		if searchItem == fullnameF.casefold() or searchItem == fullnameB.casefold() or searchItem == info[1].casefold() or searchItem == info[2].casefold():
+			found = True
+			foundContacts.append(contact)
+
+	print_info(foundContacts)
+
+	if found:
+		if len(foundContacts) == 1:
+			choice = input('Are you sure you want to delete the above? (y/n): ')
+		elif len(foundContacts) > 1:
+			print('Multiple contacts found!')
+			selection = input('Choose the associated number to delete a specific contact  or ALL to delete all (any other input will cancel): ')
+		if selection == 'ALL' or selection.isdigit() or choice == 'y':
+			with open(filepath, 'w') as f:
+				for contact in contacts:
+					info = contact.split(':')
+					names = info[0].split(',')
+					fullnameF = names[1]+' '+names[0]
+					fullnameB = names[0]+' '+names[1]
+					if selection == 'ALL' or choice == 'y':
+						if searchItem != fullnameF.casefold() and searchItem != fullnameB.casefold() and searchItem != info[1].casefold() and searchItem != info[2].casefold():
+							f.write(contact + '\n')
+							saved = saved + 1
+					elif selection.isdigit():
+						if (searchItem == fullnameF.casefold() or searchItem == fullnameB.casefold() or searchItem == info[1].casefold() or searchItem == info[2].casefold()) and counter != int(selection):
+							counter = counter + 1
+							f.write(contact + '\n')
+							saved = saved + 1
+						elif (searchItem == fullnameF.casefold() or searchItem == fullnameB.casefold() or searchItem == info[1].casefold() or searchItem == info[2].casefold()) and counter == int(selection):
+							counter = counter + 1
+						else:
+							f.write(contact + '\n')
+							saved = saved + 1
+	if len(contacts) == 1 and choice == 'y':
+		saved = 0
+	elif saved == 0:
+		saved = len(contacts)
+	print('Contacts deleted:', len(contacts) - saved)
+
+def print_contacts():
+	with open(filepath, 'r') as f:
+		contacts = [line.strip() for line in f]
+	if len(contacts) == 0:
+		print('Empty contact book :(')
+	else:
+		contacts.sort()
+		print()
+		print_info(contacts)
+
+def partial_name():
+	name = input('Name: ')
+	found, contacts = search_book(name.casefold(), 0)
+	if found:
+		print('Contacts containing', name, 'found:\n')
+		print_info(contacts)
+	else:
+		print('Name', name, 'not found')
+
+def partial_phone():
+	phone = input('Phone number: ')
+	found, contacts = search_book(phone.casefold(), 1)
+	if found:
+		print('Contacts containing', phone, 'found:\n')
+		print_info(contacts)
+	else:
+		print('Phone', phone, 'number not found')
+
+def partial_email():
+	email = input('Email: ')
+	found, contacts = search_book(email.casefold(), 2)
+	if found:
+		print('Contacts containing', email, 'found:\n')
+		print_info(contacts)
+	else:
+		print('Email', email, 'not found')
+
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-a', help='Add a new contact', action='store_true')
+	parser.add_argument('-d', help='Delete a contact given their full name, phone, or email', action='store_true')
+	parser.add_argument('-l', help='List all contacts', action='store_true')
+	parser.add_argument('-n', help='Search for a contact given a name', action='store_true')
+	parser.add_argument('-p', help='Search for a contact given a phone number', action='store_true')
+	parser.add_argument('-e', help='Search for a contact given an email', action='store_true')
+	
+	args = parser.parse_args()
+	
+	if args.a:
+		add_contact()
+	elif args.d:
+		delete_contact()
+	elif args.l:
+		print_contacts()
+	elif args.n:
+		partial_name()
+	elif args.p:
+		partial_phone()
+	elif args.e:
+		partial_email()
+	
+
+if __name__ == '__main__':
+	main()	

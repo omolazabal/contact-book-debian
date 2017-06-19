@@ -1,0 +1,8 @@
+Package: contact-book
+Section: base
+Version: 1.0
+Maintainer: Oscar Olazabal omolazabal@csu.fullerton.edu
+Architecture: all
+Priority: optional
+Depends: python3
+Description: Track contact information
