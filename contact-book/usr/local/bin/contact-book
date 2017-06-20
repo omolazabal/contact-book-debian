@@ -31,7 +31,7 @@ def search_book(searchItem, index = -1):
 		contacts = [line.strip() for line in f]
 		for contact in contacts:
 			info = contact.split(':')
-			if index == -1
+			if index == -1:
 				names = info[0].split(',')
 				fullnameF = names[1]+' '+names[0]
 				fullnameB = names[0]+' '+names[1]
@@ -139,17 +139,13 @@ def delete_contact():
 
 	"""
 
-	saved = 0	# Keeps track of how many contacts have not been deleted.
 	choice = 'n'
 	selection = ''
 	counter = 1	# Keeps track of the iteration when dealing with isdigit() deleting.
 
 	searchItem = input('Name, phone number, or email: ').casefold()
-
-	print()
-
 	found, foundContacts = search_book(searchItem)
-
+	print()
 	print_info(foundContacts)
 
 	# If a contact or more are found then we will give the user the option to 
@@ -161,34 +157,34 @@ def delete_contact():
 	if found:
 		with open(filepath, 'r') as f:
 			contacts = [line.strip() for line in f]
+		deleted = len(contacts)
 		if len(foundContacts) == 1:
 			choice = input('Are you sure you want to delete the above? (y/n): ')
 		elif len(foundContacts) > 1:
 			print('Multiple contacts found!')
-			selection = input('Choose the associated number to delete a specific contact  or ALL to delete all (any other input will cancel): ')
+			selection = input('Choose the associated number to delete a specific contact or ALL to delete all\n(any other input will cancel): ')
 		if selection == 'ALL' or selection.isdigit() or choice == 'y':
 			with open(filepath, 'w') as f:
 				for contact in contacts:
 					if selection == 'ALL' or choice == 'y':
 						if contact not in foundContacts:
 							f.write(contact + '\n')
-							saved = saved + 1
+							deleted = deleted - 1
 					elif selection.isdigit():
 						if (contact in foundContacts) and counter != int(selection):
 							counter = counter + 1
 							f.write(contact + '\n')
-							saved = saved + 1
+							deleted = deleted - 1
 						elif (contact in foundContacts) and counter == int(selection):
 							counter = counter + 1
 						else:
 							f.write(contact + '\n')
-							saved = saved + 1
+							deleted = deleted - 1
 
-	if len(contacts) == 1 and choice == 'y':
-		saved = 0
-	elif saved == 0:
-		saved = len(contacts)
-	print('Contacts deleted:', len(contacts) - saved)
+		print('Contacts deleted:', deleted)
+
+	if not found:
+		print('Contact not found')
 
 def print_contacts():
 	# Prints all of the contacts in sorted order.
