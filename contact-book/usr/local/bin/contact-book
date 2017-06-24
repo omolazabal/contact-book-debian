@@ -21,7 +21,6 @@ def search_book(searchItem, index = -1):
 	If passed an index of 2, it will search by email.
 
 	The default index is -1, where it will search by name, phone number, or email
-
 	"""
 
 	found = False
@@ -35,14 +34,18 @@ def search_book(searchItem, index = -1):
 				names = info[0].split(',')
 				fullnameF = names[1]+' '+names[0]
 				fullnameB = names[0]+' '+names[1]
-				if searchItem == fullnameF.casefold() or searchItem == fullnameB.casefold() or searchItem == info[1].casefold() or searchItem == info[2].casefold():
+				if (searchItem == fullnameF.casefold() or
+						searchItem == fullnameB.casefold() or
+						searchItem == info[1].casefold() or
+						searchItem == info[2].casefold()):
 					found = True
 					foundContacts.append(contact)				
 			elif index == 0:
 				names = info[0].split(',')
 				fullnameF = names[1]+' '+names[0]
 				fullnameB = names[0]+' '+names[1]
-				if fullnameF.casefold().startswith(searchItem.casefold()) or fullnameB.casefold().startswith(searchItem.casefold()):
+				if (fullnameF.casefold().startswith(searchItem.casefold()) or
+						fullnameB.casefold().startswith(searchItem.casefold())):
 					found = True
 					foundContacts.append(contact)
 			else:
@@ -69,7 +72,6 @@ def print_info(contacts):
 	bar,foo
 	3141592
 	foobar@foobar.com
-
 	"""
 	counter = 1
 	with open('/etc/contact-book.conf', 'r') as f:
@@ -98,7 +100,6 @@ def add_contact():
 	The format of the stored contact in the dat is as follows:
 
 	last_name,first_name:phone_number:email\n
-
 	"""
 	while True:
 		name = input('Name (first last): ')
@@ -136,7 +137,6 @@ def delete_contact():
 
 	The user will input a name, phone numner, or email. delete_contact will 
 	search for any
-
 	"""
 
 	choice = 'n'
@@ -162,7 +162,8 @@ def delete_contact():
 			choice = input('Are you sure you want to delete the above? (y/n): ')
 		elif len(foundContacts) > 1:
 			print('Multiple contacts found!')
-			selection = input('Choose the associated number to delete a specific contact or ALL to delete all\n(any other input will cancel): ')
+			selection = input('Choose the associated number to delete a specific contact '
+							  'or ALL to delete all\n(any other input will cancel): ')
 		if selection == 'ALL' or selection.isdigit() or choice == 'y':
 			with open(filepath, 'w') as f:
 				for contact in contacts:
