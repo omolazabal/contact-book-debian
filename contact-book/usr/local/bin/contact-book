@@ -163,7 +163,7 @@ def delete_contact():
 		elif len(foundContacts) > 1:
 			print('Multiple contacts found!')
 			selection = input('Choose the associated number to delete a specific contact '
-							  'or ALL to delete all\n(any other input will cancel): ')
+							  'or "ALL" to delete all\n(any other input will cancel): ')
 		if selection == 'ALL' or selection.isdigit() or choice == 'y':
 			with open(filepath, 'w') as f:
 				for contact in contacts:
