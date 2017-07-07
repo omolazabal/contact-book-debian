@@ -3,9 +3,11 @@
 import os
 import argparse
 
+
 filepath = os.path.expanduser('~/.local/share/contact-book/contact-book.dat')
 os.makedirs(os.path.dirname(filepath), exist_ok=True)
 open(filepath, 'a').close()
+
 
 def search_book(searchItem, index = -1):
 	"""Searches through the dat file and looks for the searchItem.
@@ -93,6 +95,7 @@ def print_info(contacts):
 							print()
 					counter = counter + 1
 
+
 def add_contact():
 	"""Inserts contact information into the dat file as a contact.
 
@@ -131,6 +134,7 @@ def add_contact():
 		f.write(':')
 		f.write(email)
 		f.write('\n')		
+
 
 def delete_contact():
 	""" Will delete a contact specified by the user.
@@ -187,6 +191,7 @@ def delete_contact():
 	if not found:
 		print('Contact not found')
 
+
 def print_contacts():
 	# Prints all of the contacts in sorted order.
 	with open(filepath, 'r') as f:
@@ -198,6 +203,7 @@ def print_contacts():
 		print()
 		print_info(contacts)
 
+
 def partial_name():
 	# Searches for a match of a partial name and prints their contact information.
 	name = input('Name: ')
@@ -207,6 +213,7 @@ def partial_name():
 		print_info(contacts)
 	else:
 		print('Name', name, 'not found')
+
 
 def partial_phone():
 	# Searches for a match of a partial phone number and prints their contact information.
@@ -218,6 +225,7 @@ def partial_phone():
 	else:
 		print('Phone', phone, 'number not found')
 
+
 def partial_email():
 	# Searches for a match of a partial email and prints their contact information.
 	email = input('Email: ')
@@ -227,6 +235,7 @@ def partial_email():
 		print_info(contacts)
 	else:
 		print('Email', email, 'not found')
+
 
 def main():
 	parser = argparse.ArgumentParser()
