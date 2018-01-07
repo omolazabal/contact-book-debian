@@ -1,6 +1,6 @@
 # Contact Book
 
-A little Debian contact book program accessible through the terminal. I created it to learn how to make packages for Debian and as a little exercise for python (was still learning the language).
+A little Debian contact book program accessible through the terminal.
 
 Build with package with the command `sudo dpkg --build contact-book/`.  
 Install the package with the command `sudo dpkg -i contact-book.deb`.
